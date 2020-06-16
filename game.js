@@ -182,7 +182,7 @@ const gameboard = (function(document){
         getLastClicked,
         getPlayer1,
         getPlayer2,
-    }
+    };
 
 })(document);
 
@@ -191,8 +191,52 @@ const game = (function(player1, player2){
     let currentPlayer = player1;
     const winningSequences = ["012", "345", "678", "036", "147", "258", "048", "246"];
 
-    const winner = function(){
-        currentPositions = gameboard.getPositions();
+    const miniMax = function(currentPositions = gameboard.getPositions(), symbol = "O"){
+        let currentResult = result(currentPositions);
+        switch(currentResult){
+            case player1.getName():
+                return -1;
+            case player2.getName():
+                return 1;
+            case "TIE":
+                return 0;
+            default:
+                break;
+        }
+        let score = 0;
+        for (let i = 0; i < 9; i++){
+            if (currentPositions[i] == ""){
+                let newPositions = currentPositions.slice(0);
+                newPositions[i] = symbol;
+                let newSymbol = (symbol == "O") ? "X" : "O";
+                score += miniMax(newPositions, newSymbol);
+            }
+        }
+        return score;
+    };
+
+    const decision = function(currentPositions = gameboard.getPositions()){
+        let currentIndex = 0;
+        let currentValue = null;
+        for (let i = 0; i < 9; i++){
+            if (currentPositions[i] == ""){
+                let newPositions = currentPositions.slice(0);
+                newPositions[i] = "O";
+                if (winner(newPositions) && winner(newPositions) == player2){
+                    return i;
+                }
+                let mm = miniMax(newPositions, "X");
+                console.log(mm);
+                if (currentValue == null || mm > currentValue){
+                    currentValue = mm;
+                    currentIndex = i;
+                }
+            }
+        }
+        return currentIndex;
+    };
+
+    const winner = function(currentPositions = gameboard.getPositions()){
         for (let i = 0; i < winningSequences.length; i++){
             let char0 = currentPositions[+winningSequences[i].charAt(0)];
             let char1 = currentPositions[+winningSequences[i].charAt(1)];
@@ -202,32 +246,28 @@ const game = (function(player1, player2){
             }
         }
         return null;
-    }
+    };
 
-    const isTied = function(){
-        currentPositions = gameboard.getPositions();
-        return ((currentPositions.filter((s) => s == "")).length == 0 && !winner());
-    }
-    const result = function(){
-        if (isTied()){
+    const isTied = function(currentPositions = gameboard.getPositions()){
+        return ((currentPositions.filter((s) => s == "")).length == 0 && !winner(currentPositions));
+    };
+    const result = function(currentPositions = gameboard.getPositions()){
+        if (isTied(currentPositions)){
             return "TIE";
-        }else if (winner() && winner().getSymbol() == player1.getSymbol()){
+        }else if (winner(currentPositions) && winner(currentPositions).getSymbol() == player1.getSymbol()){
             return player1.getName();
-        }else if (winner()){
+        }else if (winner(currentPositions)){
             return player2.getName();
         }else{
             return null;
         }
-    }
+    };
 
     const play = function(){
         let currentResult = result();
         if (!currentResult){
             if (currentPlayer.getName() == "Computer"){
-                let setPositionReturnValue;
-                do{
-                    setPositionReturnValue = gameboard.setPosition(Math.floor(Math.random() * 9), currentPlayer.getSymbol());
-                }while (setPositionReturnValue == null);
+                gameboard.setPosition(decision(), currentPlayer.getSymbol());
                 currentPlayer = (currentPlayer == player1) ? player2 : player1;
             }
             else if (gameboard.setPosition(gameboard.getLastClicked(), currentPlayer.getSymbol()) !== null){
@@ -236,12 +276,12 @@ const game = (function(player1, player2){
         }else{
             console.log(currentResult);
         }
-    }
+    };
 
     return {
         result,
         play,
-    }
+    };
 
 });
 
