@@ -215,6 +215,19 @@ const game = (function(player1, player2){
         }
         return null;
     };
+
+    const winningPattern = function(currentPositions = gameboard.getPositions()){
+        for (let i = 0; i < 9; i++){
+            if (currentPositions[i] == ""){
+                let newPositions = currentPositions.slice(0);
+                newPositions[i] = "O";
+                if (winner(newPositions) && winner(newPositions) == player2){
+                    return i;
+                }
+            }
+        }
+        return null;
+    };
     
     const miniMax = function(currentPositions = gameboard.getPositions(), symbol = "O"){
         let currentResult = result(currentPositions);
@@ -245,6 +258,10 @@ const game = (function(player1, player2){
         let currentValue = null;
         let blockPossibility = block(currentPositions);
         let diagonalPatternPossibility = diagonalPattern(currentPositions);
+        let winningPatternPossibility = winningPattern(currentPositions);
+        if (winningPatternPossibility != null){
+            return winningPatternPossibility;
+        }
         if (blockPossibility != null){
             return blockPossibility;
         }
@@ -255,9 +272,6 @@ const game = (function(player1, player2){
             if (currentPositions[i] == ""){
                 let newPositions = currentPositions.slice(0);
                 newPositions[i] = "O";
-                if (winner(newPositions) && winner(newPositions) == player2){
-                    return i;
-                }
                 let mm = miniMax(newPositions, "X");
                 console.log(mm);
                 if (currentValue == null || mm > currentValue){
