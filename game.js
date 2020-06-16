@@ -122,6 +122,9 @@ const gameboard = (function(document){
                 div.addEventListener('click', e => {
                     lastClicked = i;
                     currentGame.play();
+                    if (againstComputer){
+                        currentGame.play();
+                    }
                     updateGameBoard(container);
                 });
                 container.appendChild(div);
