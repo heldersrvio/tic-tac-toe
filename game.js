@@ -191,6 +191,28 @@ const game = (function(player1, player2){
     let currentPlayer = player1;
     const winningSequences = ["012", "345", "678", "036", "147", "258", "048", "246"];
 
+    const block = function(currentPositions = gameboard.getPositions()){
+        for (let i = 0; i < 9; i++){
+            if (currentPositions[i] == ""){
+                let newPositions = currentPositions.slice(0);
+                newPositions[i] = "X";
+                if (winner(newPositions) == player1){
+                    return i;
+                }
+            }
+        }
+        return null;
+    };
+
+    const diagonalPattern = function(currentPositions = gameboard.getPositions()){
+        if (currentPositions[4] == "O"){
+            if (currentPositions[0] == currentPositions[8] || currentPositions[2] == currentPositions[6]){
+                return [1, 3, 5, 7][Math.floor(Math.random() * 4)];
+            }
+        }
+        return null;
+    };
+    
     const miniMax = function(currentPositions = gameboard.getPositions(), symbol = "O"){
         let currentResult = result(currentPositions);
         switch(currentResult){
@@ -218,6 +240,14 @@ const game = (function(player1, player2){
     const decision = function(currentPositions = gameboard.getPositions()){
         let currentIndex = 0;
         let currentValue = null;
+        let blockPossibility = block(currentPositions);
+        let diagonalPatternPossibility = diagonalPattern(currentPositions);
+        if (blockPossibility != null){
+            return blockPossibility;
+        }
+        if (diagonalPatternPossibility != null){
+            return diagonalPatternPossibility;
+        }
         for (let i = 0; i < 9; i++){
             if (currentPositions[i] == ""){
                 let newPositions = currentPositions.slice(0);
