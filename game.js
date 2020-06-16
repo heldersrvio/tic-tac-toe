@@ -10,11 +10,98 @@ const player = (function(pname, xOrO){
 });
 
 const gameboard = (function(document){
+    let body = document.querySelector('body');
     let positions = ["", "", "", "", "", "", "", "", ""];
     let lastClicked = null;
     let start = false;
     let player1Name = "";
     let player2Name = "";
+
+    const startButton = document.createElement('button');
+    startButton.textContent = "Start";
+    startButton.addEventListener('click', e => {
+        let container = document.querySelector('.gameboard');
+        let p1name = document.querySelector('#p1name').value;
+        let p2name = document.querySelector('#p2name').value;
+
+        p1name ? player1Name = p1name : player1Name = "Player 1";
+        p2name ? player2Name = p2name : player2Name = "Player 2";
+
+        start = true;
+        clear();
+        let currentGame = game(document, getPlayer1(), getPlayer2());
+        gameScreen(currentGame, container);
+    });
+
+    const restartButton = document.createElement('button');
+    restartButton.textContent = "Restart";
+    restartButton.addEventListener('click', e => {
+        positions = ["", "", "", "", "", "", "", "", ""];
+        start = false;
+        lastClicked = null;
+        player1Name = "";
+        player2Name = "";
+        clear();
+        firstScreen();
+    });
+
+    const firstScreen = function(){
+        let form = document.createElement('form');
+        let labelP1 = document.createElement('label');
+        let labelP2 = document.createElement('label');
+        let inputP1 = document.createElement('input');
+        let inputP2 = document.createElement('input');
+
+        labelP1.for = "p1name";
+        labelP1.textContent = "Player 1";
+        labelP2.for = "p2name";
+        labelP2.textContent = "Player 2";
+        inputP1.type = "text";
+        inputP1.id = "p1name";
+        inputP1.name = "p1name";
+        inputP2.type = "text";
+        inputP2.id = "p2name";
+        inputP2.name = "p2name";
+
+        form.appendChild(labelP1);
+        form.appendChild(inputP1);
+        form.appendChild(labelP2);
+        form.appendChild(inputP2);
+        body.appendChild(form);
+
+        body.appendChild(startButton);
+    };
+
+    const updateGameBoard = function(container){
+        if (container){
+            for (let i = 0; i < 9; i++){
+                let div = container.querySelector(`#\\3${i}`);
+                if (div.firstChild.textContent != positions[i]){
+                    div.firstChild.textContent = positions[i];
+                }
+            }
+        }
+    }
+
+    const gameScreen = function(currentGame, container){
+        if (start && container){
+            for (let i = 0; i < 9; i++){
+                let div = document.createElement('div');
+                let p = document.createElement('p');
+                p.textContent = positions[i];
+                div.appendChild(p);
+                div.id = i.toString();
+                div.style.cssText = "border: 1pt solid black";
+                div.addEventListener('click', e => {
+                    lastClicked = i;
+                    currentGame.play();
+                    updateGameBoard(container);
+                });
+                container.appendChild(div);
+            }
+            body.appendChild(restartButton);
+        }
+    };
 
     const getPositions = () => positions;
 
@@ -27,7 +114,6 @@ const gameboard = (function(document){
     };
 
     const clear = function(){
-        let body = document.querySelector('body');
         const container = document.querySelector('.gameboard');
         if (container){
             while (container.firstChild){
@@ -42,75 +128,16 @@ const gameboard = (function(document){
         if (button){
             body.removeChild(button);
         }
-    }
+    };
 
     const render = function(){
-        let body = document.querySelector('body');
         clear();
         if (!start){
-            let form = document.createElement('form');
-            let labelP1 = document.createElement('label');
-            let labelP2 = document.createElement('label');
-            let inputP1 = document.createElement('input');
-            let inputP2 = document.createElement('input');
-
-            labelP1.for = "p1name";
-            labelP1.textContent = "Player 1";
-            labelP2.for = "p2name";
-            labelP2.textContent = "Player 2";
-            inputP1.type = "text";
-            inputP1.id = "p1name";
-            inputP1.name = "p1name";
-            inputP2.type = "text";
-            inputP2.id = "p2name";
-            inputP2.name = "p2name";
-
-            form.appendChild(labelP1);
-            form.appendChild(inputP1);
-            form.appendChild(labelP2);
-            form.appendChild(inputP2);
-            body.appendChild(form);
-
-            let startButton = document.createElement('button');
-            startButton.textContent = "Start";
-            startButton.addEventListener('click', e => {
-                let p1name = document.querySelector('#p1name').value;
-                let p2name = document.querySelector('#p2name').value;
-
-                p1name ? player1Name = p1name : player1Name = "Player 1";
-                p2name ? player2Name = p2name : player2Name = "Player 2";
-
-                start = true;
-                render();
-                console.log(getPlayer1().getName());
-                game(document, getPlayer1(), getPlayer2()).play();
-            })
-            body.appendChild(startButton);
+            firstScreen();
         }
         let container = document.querySelector('.gameboard');
-        if (start && container){
-            for (let i = 0; i < 9; i++){
-                let div = document.createElement('div');
-                let p = document.createElement('p');
-                p.textContent = positions[i];
-                div.appendChild(p);
-                div.style.cssText = "border: 1pt solid black";
-                div.addEventListener('click', e => {
-                    lastClicked = i;
-                });
-                container.appendChild(div);
-            }
-            let restartButton = document.createElement('button');
-            restartButton.textContent = "Restart";
-            restartButton.addEventListener('click', e => {
-                positions = ["", "", "", "", "", "", "", "", ""];
-                start = false;
-                lastClicked = null;
-                player1Name = "";
-                player2Name = "";
-                render();
-            })
-            body.appendChild(restartButton);
+        if (container){
+            gameScreen(container);
         }
     };
 
@@ -122,6 +149,7 @@ const gameboard = (function(document){
     return {
         getPositions,
         setPosition,
+        gameScreen,
         render,
         getLastClicked,
         getPlayer1,
@@ -153,7 +181,6 @@ const game = (function(document, player1, player2){
         return ((currentPositions.filter((s) => s == "")).length == 0 && !winner());
     }
     const result = function(){
-        debugger;
         if (isTied()){
             return "TIE";
         }else if (winner() && winner().getSymbol() == player1.getSymbol()){
@@ -166,19 +193,13 @@ const game = (function(document, player1, player2){
     }
 
     const play = function(){
-        let container = document.querySelector('.gameboard');
-        if (container){
-            container.addEventListener('click', e => {
-                let currentResult = result();
-                if (!currentResult){
-                    if (gameboard.setPosition(gameboard.getLastClicked(), currentPlayer.getSymbol()) !== null){
-                        currentPlayer = (currentPlayer == player1) ? player2 : player1;
-                    }
-                    gameboard.render();
-                }else{
-                    console.log(currentResult);
-                }
-            });
+        let currentResult = result();
+        if (!currentResult){
+            if (gameboard.setPosition(gameboard.getLastClicked(), currentPlayer.getSymbol()) !== null){
+                currentPlayer = (currentPlayer == player1) ? player2 : player1;
+            }
+        }else{
+            console.log(currentResult);
         }
     }
 
