@@ -99,13 +99,22 @@ const gameboard = (function(document){
         body.appendChild(startButton);
     };
 
-    const updateGameBoard = function(container){
+    const updateGameBoard = function(currentGame, container){
         if (container){
             for (let i = 0; i < 9; i++){
                 let div = container.querySelector(`#\\3${i}`);
                 if (div.firstChild.textContent != positions[i]){
                     div.firstChild.textContent = positions[i];
                 }
+            }
+            let res = currentGame.result();
+            if (res && !document.querySelector('.result-message')){
+                let resultMessage = document.createElement('div');
+                resultMessage.classList.add('result-message');
+                let resultMessageP = document.createElement('p');
+                resultMessageP.textContent = res;
+                resultMessage.appendChild(resultMessageP);
+                body.appendChild(resultMessage);
             }
         }
     }
@@ -125,7 +134,7 @@ const gameboard = (function(document){
                     if (againstComputer){
                         currentGame.play();
                     }
-                    updateGameBoard(container);
+                    updateGameBoard(currentGame, container);
                 });
                 container.appendChild(div);
             }
@@ -158,6 +167,10 @@ const gameboard = (function(document){
         while (button){
             body.removeChild(button);
             button = document.querySelector('button');
+        }
+        let message = document.querySelector('.result-message');
+        if (message){
+            body.removeChild(message);
         }
     };
 
@@ -206,6 +219,32 @@ const game = (function(player1, player2){
         }
         return null;
     };
+
+    const doubleWin = function(currentPositions = gameboard.getPositions()){
+        let opponentWinPossibilities = 0
+        for (let i = 0; i < 9; i++){
+            if (currentPositions[i] == ""){
+                let newPositions = currentPositions.slice(0);
+                newPositions[i] = "X";
+                let occupiedByX = newPositions.map((v, i) => {
+                    if (v == "X"){
+                        return i;
+                    }
+                    return -1;
+                }).filter(v => v != -1);
+                for (let j = 0; j < winningSequences.length; j++){
+                    if (occupiedByX.includes(+winningSequences[j].charAt(0)) && occupiedByX.includes(+winningSequences[j].charAt(1)) || occupiedByX.includes(+winningSequences[j].charAt(2)) && occupiedByX.includes(+winningSequences[j].charAt(0)) || occupiedByX.includes(+winningSequences[j].charAt(1)) && occupiedByX.includes(+winningSequences[j].charAt(2))){
+                        opponentWinPossibilities++;
+                    } 
+                }
+                if (opponentWinPossibilities > 1){
+                    return i;
+                }
+                opponentWinPossibilities = 0;
+            }
+        }
+        return null;
+    }
 
     const diagonalPattern = function(currentPositions = gameboard.getPositions()){
         if (currentPositions[4] == "O"){
@@ -262,6 +301,7 @@ const game = (function(player1, player2){
         let blockPossibility = block(currentPositions);
         let diagonalPatternPossibility = diagonalPattern(currentPositions);
         let winningPatternPossibility = winningPattern(currentPositions);
+        let doubleWinPossibility = doubleWin(currentPositions);
         if (winningPatternPossibility != null){
             return winningPatternPossibility;
         }
@@ -271,12 +311,14 @@ const game = (function(player1, player2){
         if (diagonalPatternPossibility != null){
             return diagonalPatternPossibility;
         }
+        if (doubleWinPossibility != null){
+            return doubleWinPossibility;
+        }
         for (let i = 0; i < 9; i++){
             if (currentPositions[i] == ""){
                 let newPositions = currentPositions.slice(0);
                 newPositions[i] = "O";
                 let mm = miniMax(newPositions, "X");
-                console.log(mm);
                 if (currentValue == null || mm > currentValue){
                     currentValue = mm;
                     currentIndex = i;
@@ -303,11 +345,11 @@ const game = (function(player1, player2){
     };
     const result = function(currentPositions = gameboard.getPositions()){
         if (isTied(currentPositions)){
-            return "TIE";
+            return "It's a tie.";
         }else if (winner(currentPositions) && winner(currentPositions).getSymbol() == player1.getSymbol()){
-            return player1.getName();
+            return player1.getName() + " won the game.";
         }else if (winner(currentPositions)){
-            return player2.getName();
+            return player2.getName() + " won the game.";
         }else{
             return null;
         }
@@ -323,8 +365,6 @@ const game = (function(player1, player2){
             else if (gameboard.setPosition(gameboard.getLastClicked(), currentPlayer.getSymbol()) !== null){
                 currentPlayer = (currentPlayer == player1) ? player2 : player1;
             }
-        }else{
-            console.log(currentResult);
         }
     };
 
