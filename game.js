@@ -224,17 +224,16 @@ const game = (function(player1, player2){
         let opponentWinPossibilities = 0
         for (let i = 0; i < 9; i++){
             if (currentPositions[i] == ""){
+                console.log(i);
                 let newPositions = currentPositions.slice(0);
                 newPositions[i] = "X";
-                let occupiedByX = newPositions.map((v, i) => {
-                    if (v == "X"){
-                        return i;
-                    }
-                    return -1;
-                }).filter(v => v != -1);
-                for (let j = 0; j < winningSequences.length; j++){
-                    if (occupiedByX.includes(+winningSequences[j].charAt(0)) && occupiedByX.includes(+winningSequences[j].charAt(1)) || occupiedByX.includes(+winningSequences[j].charAt(2)) && occupiedByX.includes(+winningSequences[j].charAt(0)) || occupiedByX.includes(+winningSequences[j].charAt(1)) && occupiedByX.includes(+winningSequences[j].charAt(2))){
-                        opponentWinPossibilities++;
+                for (let j = 0; j < 9; j++){
+                    if (newPositions[j] == ""){
+                        let newNewPositions = newPositions.slice(0);
+                        newNewPositions[j] = "X";
+                        if (winner(newNewPositions) == player1){
+                            opponentWinPossibilities++;
+                        }
                     } 
                 }
                 if (opponentWinPossibilities > 1){
@@ -295,6 +294,44 @@ const game = (function(player1, player2){
         return score;
     };
 
+    const sameColumHasX = function(currentPositions = gameboard.getPositions(), a){
+        switch(a){
+            case 0:
+            case 3:
+            case 6:
+                return ([currentPositions[0], currentPositions[3], currentPositions[6]].includes("X"));
+            case 1:
+            case 4:
+            case 7:
+                return ([currentPositions[1], currentPositions[4], currentPositions[7]].includes("X"));
+            case 2:
+            case 5:
+            case 8:
+                return ([currentPositions[2], currentPositions[5], currentPositions[8]].includes("X"));
+            default:
+                return false;
+        }
+    }
+
+    const sameRowHasX = function(currentPositions = gameboard.getPositions(), a){
+        switch(a){
+            case 0:
+            case 1:
+            case 2:
+                return ([currentPositions[0], currentPositions[1], currentPositions[2]].includes("X"));
+            case 3:
+            case 4:
+            case 5:
+                return ([currentPositions[3], currentPositions[4], currentPositions[5]].includes("X"));
+            case 6:
+            case 7:
+            case 8:
+                return ([currentPositions[6], currentPositions[7], currentPositions[8]].includes("X"));
+            default:
+                return false;
+        }
+    }
+
     const decision = function(currentPositions = gameboard.getPositions()){
         let currentIndex = 0;
         let currentValue = null;
@@ -319,7 +356,7 @@ const game = (function(player1, player2){
                 let newPositions = currentPositions.slice(0);
                 newPositions[i] = "O";
                 let mm = miniMax(newPositions, "X");
-                if (currentValue == null || mm > currentValue){
+                if ((currentValue == null || mm > currentValue) && (sameColumHasX(currentPositions, i) || sameRowHasX(currentPositions, i))){
                     currentValue = mm;
                     currentIndex = i;
                 }
