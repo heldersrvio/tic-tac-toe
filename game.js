@@ -224,7 +224,6 @@ const game = (function(player1, player2){
         let opponentWinPossibilities = 0
         for (let i = 0; i < 9; i++){
             if (currentPositions[i] == ""){
-                console.log(i);
                 let newPositions = currentPositions.slice(0);
                 newPositions[i] = "X";
                 for (let j = 0; j < 9; j++){
@@ -339,6 +338,11 @@ const game = (function(player1, player2){
         let diagonalPatternPossibility = diagonalPattern(currentPositions);
         let winningPatternPossibility = winningPattern(currentPositions);
         let doubleWinPossibility = doubleWin(currentPositions);
+        if (currentPositions.filter(v => v == "X").length == 1){
+            if ([0, 2, 6, 8].includes(currentPositions.indexOf('X'))){
+                return 4;
+            }
+        }
         if (winningPatternPossibility != null){
             return winningPatternPossibility;
         }
