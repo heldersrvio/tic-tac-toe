@@ -14,11 +14,11 @@ body{
     font-family: 'Chewy', cursive;
     font-size: 70px;
     text-align: center;
-    padding-top: auto;
 }
 
 #\30, #\31, #\32, #\33, #\34, #\35, #\36, #\37, #\38{
     border: 5pt solid white;
+    margin: 0.1px;
 }
 
 #\30, #\31, #\32{
@@ -39,7 +39,8 @@ body{
 
 button{
     margin-top: 50px;
-    margin-left: 20px;
+    margin-left: auto;
+    margin-right: auto;
     border: 1pt solid rgb(194, 148, 105);
     font-family: 'Chewy', cursive;
     font-size: 30px;
@@ -52,6 +53,10 @@ button{
     position: absolute;
     top: 300px;
     left: 290px;
+}
+
+.play-options button{
+    margin-right: 20px;
 }
 
 label{
