@@ -360,6 +360,9 @@ const game = (function(player1, player2){
             if ([0, 2, 6, 8].includes(currentPositions.indexOf('X'))){
                 return 4;
             }
+            if (currentPositions.indexOf('X') == 4){
+                return [0, 2, 6, 8][Math.floor(Math.random() * 4)];
+            }
         }
         if (winningPatternPossibility != null){
             return winningPatternPossibility;
