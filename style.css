@@ -1,5 +1,73 @@
+body{
+    text-align: center;
+    background-color: rgb(66, 105, 78);
+}
+
 .gameboard{
     display: grid;
-    grid-template-columns: 40px 40px 40px;
-    grid-template-rows: 40px 40px 40px;
+    grid-template-columns: 120px 120px 120px;
+    grid-template-rows: 120px 120px 120px;
+    width: 360px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 100px;
+    font-family: 'Chewy', cursive;
+    font-size: 70px;
+    text-align: center;
+    padding-top: auto;
+}
+
+#\30, #\31, #\32, #\33, #\34, #\35, #\36, #\37, #\38{
+    border: 5pt solid white;
+}
+
+#\30, #\31, #\32{
+    border-top: none;
+}
+
+#\30, #\33, #\36{
+    border-left: none;
+}
+
+#\36, #\37, #\38{
+    border-bottom: none;
+}
+
+#\32, #\35, #\38{
+    border-right: none;
+}
+
+button{
+    margin-top: 50px;
+    margin-left: 20px;
+    border: 1pt solid rgb(194, 148, 105);
+    font-family: 'Chewy', cursive;
+    font-size: 30px;
+    border-radius: 5%;
+    background-color: rgb(184, 124, 68);
+    color: white;
+}
+
+.play-options{
+    position: absolute;
+    top: 300px;
+    left: 290px;
+}
+
+label{
+    font-family: 'Chewy', cursive;
+    font-size: 30px;
+    color: white;
+    margin-right: 20px;
+}
+
+input{
+    margin-right: 20px;
+}
+
+.result-message{
+    margin-top: 50px;
+    color: white;
+    font-family: 'Chewy', cursive;
+    font-size: 30px;
 }

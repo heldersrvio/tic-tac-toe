@@ -46,6 +46,9 @@ const gameboard = (function(document){
         selectionScreen();
     });
 
+    const playOptions = document.createElement('div');
+    playOptions.classList.add('play-options');
+
     const playAgainstComputerButton = document.createElement('button');
     playAgainstComputerButton.textContent = "Play against the computer";
     playAgainstComputerButton.addEventListener('click', e => {
@@ -62,9 +65,11 @@ const gameboard = (function(document){
         firstScreen();
     });
 
+    playOptions.appendChild(playAgainstComputerButton);
+    playOptions.appendChild(playAgainstHuman);
+
     const selectionScreen = function(){
-        body.appendChild(playAgainstComputerButton);
-        body.appendChild(playAgainstHuman);
+        body.appendChild(playOptions);
     }
 
     const firstScreen = function(){
@@ -75,7 +80,7 @@ const gameboard = (function(document){
         let inputP2 = document.createElement('input');
 
         labelP1.for = "p1name";
-        labelP1.textContent = "Player 1";
+        labelP1.textContent = "Player 1:";
         inputP1.type = "text";
         inputP1.id = "p1name";
         inputP1.name = "p1name";
@@ -86,7 +91,7 @@ const gameboard = (function(document){
 
         if (!againstComputer){
 
-            labelP2.textContent = "Player 2";
+            labelP2.textContent = "Player 2:";
             inputP2.type = "text";
             inputP2.id = "p2name";
             inputP2.name = "p2name";
@@ -105,6 +110,11 @@ const gameboard = (function(document){
                 let div = container.querySelector(`#\\3${i}`);
                 if (div.firstChild.textContent != positions[i]){
                     div.firstChild.textContent = positions[i];
+                    if (div.firstChild.textContent == 'O'){
+                        div.firstChild.style.cssText = "color: rgb(255, 245, 106)"
+                    }else{
+                        div.firstChild.style.cssText = "color: rgb(106, 238, 255)"
+                    }
                 }
             }
             let res = currentGame.result();
@@ -114,7 +124,7 @@ const gameboard = (function(document){
                 let resultMessageP = document.createElement('p');
                 resultMessageP.textContent = res;
                 resultMessage.appendChild(resultMessageP);
-                body.appendChild(resultMessage);
+                body.insertBefore(resultMessage, restartButton);
             }
         }
     }
@@ -125,9 +135,13 @@ const gameboard = (function(document){
                 let div = document.createElement('div');
                 let p = document.createElement('p');
                 p.textContent = positions[i];
+                if (p.textContent == 'O'){
+                    p.style.cssText = "color: rgb(255, 245, 106)"
+                }else{
+                    p.style.cssText = "color: rgb(106, 238, 255)"
+                }
                 div.appendChild(p);
                 div.id = i.toString();
-                div.style.cssText = "border: 1pt solid black";
                 div.addEventListener('click', e => {
                     lastClicked = i;
                     currentGame.play();
@@ -162,6 +176,10 @@ const gameboard = (function(document){
         let form = document.querySelector('form');
         if (form){
             body.removeChild(form);
+        }
+        let options = document.querySelector('.play-options');
+        if (options){
+            body.removeChild(options);
         }
         let button = document.querySelector('button');
         while (button){
