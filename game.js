@@ -265,7 +265,12 @@ const game = (function(player1, player2){
     const diagonalPattern = function(currentPositions = gameboard.getPositions()){
         if (currentPositions[4] == "O"){
             if (currentPositions[0] == currentPositions[8] && currentPositions[0] == 'X' || currentPositions[2] == currentPositions[6] && currentPositions[2] == 'X'){
-                let diagonalPositions = [currentPositions[1], currentPositions[3], currentPositions[5], currentPositions[7]].filter(v => v == "").map((v, i) => i);
+                let diagonalPositions = [currentPositions[1], currentPositions[3], currentPositions[5], currentPositions[7]].map((v, i) => {
+                    if (v == ""){
+                        return i;
+                    }
+                    return "N";
+                }).filter(v => v != "N");
                 if (diagonalPositions.length > 0){
                     return diagonalPositions[Math.floor(Math.random() * diagonalPositions.length)];
                 }
